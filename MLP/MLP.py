@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 g = open("DMT/TRAININGSET-DMT_SIMP-VARDIAL2019/train.txt", "r")
 texts = list(map(lambda x:x[:-1].lower(),g.readlines()))
 g.close()
@@ -14,7 +11,7 @@ g.close()
 
 
 
-# In[2]: get types
+#get types
 types = list()
 tokens= list()
 types_test = list()
@@ -24,21 +21,15 @@ test_count=0
 texts_temp = list()
 texts_test_temp = list()
 for t in texts:
-    #print(t)
-    #if t == 't' or 'm':
-     #   types.remove(t)
-    #unit = t.decode('utf-8')
-    #print(unit, len(unit))
+
     types.append(t[-1])
     texts_temp.append(t[:-1])
-    #tokens = t.decode("utf-8").split(" ")
-    #print(tokens)
+
     train_count+=1
 texts = texts_temp
 print("training data lines:"+ str(train_count))
 
 for x in texts_test:
-    #test_unit = t.decode('utf-8')
     types_test.append(x[-1])
     test_count+=1
     texts_test_temp.append(x[:-1])
@@ -49,8 +40,6 @@ print("test data lines:"+ str(test_count))
 
 
 print("types \t: texts")
-#print(types[50])
-#print(texts[50])
 print(str(types[0]) + "\t: " + texts[0])
 print(str(types[50]) + "\t: " + texts[50])
 print(str(types[55]) + "\t: " + texts[55])
@@ -58,11 +47,6 @@ print(str(types[100]) + "\t: " + texts[1500])
 print("types_test \t: texts_test")
 print(str(types_test[0])+ "\t: " + texts_test[0])
 print(str(types_test[1])+ "\t: " + texts_test[1])
-
-
-
-
-# In[3]:
 
 
 from collections import Counter
@@ -84,21 +68,13 @@ for i in range(len(texts)):
             total_counts[word] += 1
 
 
-
-# In[4]:
-
-
 t_counts.most_common()
 
-
-# In[5]:
 
 print(t_counts.most_common())
 
 
-# In[6]:
-
-
+#t_m_ratio:
 t_m_ratios = Counter()
 t_m_raw_ratios = Counter()
 for word, cnt in list(total_counts.most_common()):
@@ -109,23 +85,22 @@ for word, cnt in list(total_counts.most_common()):
 t_m_raw_ratios = t_m_ratios
 
 
-# In[7]:
+# print t/m ratio for some words:
 
-'''
-print("MUN / QUO raw ratio for 'universe' = {}".format(t_m_ratios["universe"]))
-print("MUN / QUO raw ratio for 'earth' = {}".format(t_m_ratios["earth"]))
-print("MUN / QUO raw ratio for 'possible' = {}".format(t_m_ratios["possible"]))
-print("MUN / QUO raw ratio for 'believe' = {}".format(t_m_ratios["believe"]))
-'''
-
+print("T for '的' : "+format(t_counts['的']))
+print("M for '的' : "+format(m_counts['的']))
+print("T/M raw ration for '的' : " + format(t_m_ratios['的']))
 # In[8]:
-
+print("t / m  ratio for '我' = {}".format(t_m_ratios["我"]))
+print("t / m  ratio for '的' = {}".format(t_m_ratios["的"]))
+print("t / m  ratio for '本钱' = {}".format(t_m_ratios["本钱"]))
+print("t / m  ratio for '种' = {}".format(t_m_ratios["种"]))
 
 for word, ratio in t_m_ratios.most_common():
     t_m_ratios[word] = np.log(ratio + 0.01)
 
 
-# In[9]:
+# t/m ratio log:
 
 
 print("t / m log ratio for '我' = {}".format(t_m_ratios["我"]))
@@ -133,20 +108,9 @@ print("t / m log ratio for '的' = {}".format(t_m_ratios["的"]))
 print("t / m log ratio for '本钱' = {}".format(t_m_ratios["本钱"]))
 print("t / m log ratio for '种' = {}".format(t_m_ratios["种"]))
 
-
-# In[10]:
-
-
+#reverse t_m_ratios.most_common
 t_m_ratios.most_common()
-
-
-# In[11]:
-
-
 list(reversed(t_m_ratios.most_common()))
-
-
-# In[12]:
 
 
 vocabulary = set(total_counts.keys())
@@ -159,15 +123,10 @@ for i, word in enumerate(vocabulary):
     word2index[word] = i
 
 
-
-# In[13]:
-
-
 word2index
 
 
-# In[14]:
-
+# processing code:
 
 import time
 import sys
@@ -230,6 +189,7 @@ class TextClassificationNetwork:
                             text_vocab.add(word)
                     else:
                         text_vocab.add(word)
+
 
         # Convert the vocabulary set to a list so we can access words via indices
         self.text_vocab = list(text_vocab)
@@ -362,9 +322,11 @@ class TextClassificationNetwork:
             pred = self.run(testing_texts[i])
             if(pred == testing_types[i]):
                 correct += 1
-            #else:
-                #print('\n wrong prediction:')
-                #print(testing_texts[i] + '\n')
+            else:
+                print('\n wrong prediction:')
+                print(testing_texts[i])
+                print('\n')
+                print(testing_types[i])
 
             # For debug purposes, print out our prediction accuracy and speed 
             # throughout the prediction process. 
@@ -397,15 +359,11 @@ class TextClassificationNetwork:
 
 
 
-# In[23]:
+#train data
 
 
 mlp = TextClassificationNetwork(texts[:-3000],types[:-3000], min_count=0, polarity_cutoff=0.3, learning_rate=0.05)
 mlp.train(texts ,types)
-
-#import random
-#random.shuffle(a_list,random.random)
-#random.sample(a_list, number of samples)
 
 
 # In[24]:
